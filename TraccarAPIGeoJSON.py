@@ -5,17 +5,18 @@
 #Pour recevoir les informations en format JSON de Traccar, utliser la méthode getPositionsJSON.
 #Pour enregistrer les informations de Traccar en format GEOJSON : getPositionsGEOJSON
 
+#Vérification si le module existe.
+try:
+    __import__("geojson")
+except ModuleNotFoundError:
+    print(f"Le module 'geojson' n'existe pas, veuillez l'installer")
+
 import datetime, requests
 from geojson import Feature, FeatureCollection, Point
 from requests.auth import HTTPBasicAuth
 
 class Traccar:
     def __init__(self, url:str, username: str, password:str) -> None:
-        #Vérification si le module existe.
-        try:
-            __import__("geojson")
-        except ModuleNotFoundError:
-            print(f"Le module 'geojson' n'existe pas, veuillez l'installer")
 
         self.url = url
         self.username = username
