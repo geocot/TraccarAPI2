@@ -6,6 +6,9 @@ __pycache__/
 # C extensions
 *.so
 
+#Ignore fichier de lancement pour les tests
+main.py
+
 # Distribution / packaging
 .Python
 build/
