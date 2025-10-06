@@ -11,6 +11,12 @@ from requests.auth import HTTPBasicAuth
 
 class Traccar:
     def __init__(self, url:str, username: str, password:str) -> None:
+        #Vérification si le module existe.
+        try:
+            __import__("geojson")
+        except ModuleNotFoundError:
+            print(f"Le module 'geojson' n'existe pas, veuillez l'installer")
+
         self.url = url
         self.username = username
         self.password = password
@@ -76,7 +82,6 @@ class Traccar:
         file.write(str(fc))
         file.close()
 
-#Exemple d'utilisation
 if __name__ == "__main__":
     import TraccarAPI2 as tr2
     import datetime
