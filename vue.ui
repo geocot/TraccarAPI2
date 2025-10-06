@@ -18,6 +18,27 @@
     <item>
      <layout class="QVBoxLayout" name="verticalLayout">
       <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_8">
+        <item>
+         <widget class="QLabel" name="label_6">
+          <property name="font">
+           <font>
+            <pointsize>12</pointsize>
+            <weight>75</weight>
+            <bold>true</bold>
+           </font>
+          </property>
+          <property name="text">
+           <string>URL</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLineEdit" name="leURL"/>
+        </item>
+       </layout>
+      </item>
+      <item>
        <layout class="QHBoxLayout" name="horizontalLayout">
         <item>
          <widget class="QLabel" name="label">
@@ -159,12 +180,15 @@
         <item>
          <widget class="QPushButton" name="btnFichierOut">
           <property name="text">
-           <string>Choisir fichier sortie</string>
+           <string>Choisir fichier sortie geojson</string>
           </property>
          </widget>
         </item>
         <item>
          <widget class="QLabel" name="laPath">
+          <property name="styleSheet">
+           <string notr="true">color: rgb(0, 85, 255);</string>
+          </property>
           <property name="text">
            <string>Chemin d'accès vide</string>
           </property>

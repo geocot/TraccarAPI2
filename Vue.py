@@ -7,15 +7,19 @@ class UI(QMainWindow):
         uic.loadUi("vue.ui",self)
         self.setWindowTitle("Traccar API")
         self.controller = controller#Définition du controller
+        self.leURL = self.findChild(QLineEdit,"leURL")
         self.leUsager = self.findChild(QLineEdit,"leUsager")
         self.leMotPasse = self.findChild(QLineEdit,"leMotPasse")
         self.leDeviceId = self.findChild(QLineEdit,"leDeviceId")
         self.calDe = self.findChild(QCalendarWidget,"calDe")
         self.calA = self.findChild(QCalendarWidget,"calA")
         self.btnFichierOut = self.findChild(QPushButton,"btnFichierOut")
+        self.btnFichierOut.clicked.connect(self.ouvertureFichierOutut)
         self.laPath = self.findChild(QLabel,"laPath")
         self.btnSauvegarde = self.findChild(QPushButton,"btnSauvegarde")
 
     def ouvertureFichierOutut(self):
-        save_file_name, _ = QFileDialog.getSaveFileName(self, "Save File", "my_document.txt",
-                                                        "Text Files (*.txt);;All Files (*)")
+        fichier = QFileDialog.getSaveFileName(self, "Sauvegarde GEOJSON", "position.geojson",
+                                                        "Fichier geojson (*.geojson)")
+        if fichier:
+            self.laPath.setText( fichier[0])

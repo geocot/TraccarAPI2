@@ -5,7 +5,7 @@ except ModuleNotFoundError:
 
 import TraccarAPIGeoJSON as tr2
 import Vue, sys, Controller
-from PyQt5.QtWidgets import QApplication
+from PyQt5.QtWidgets import QApplication, QCalendarWidget
 
 
 class App(QApplication):
@@ -14,6 +14,7 @@ class App(QApplication):
         self.model = tr2.Traccar()
         self.controller = Controller.Controller(self.model)
         self.vue = Vue.UI(self.controller)
+        self.controller.setVue(self.vue)
         self.vue.show()
 
 

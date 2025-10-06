@@ -3,4 +3,10 @@ class Controller():
         self.model = model
 
 
+    def setVue(self, vue):
+        self.vue = vue
+
+
+
+
 
