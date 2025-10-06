@@ -166,7 +166,7 @@
         <item>
          <widget class="QLabel" name="laPath">
           <property name="text">
-           <string>TextLabel</string>
+           <string>Chemin d'accès vide</string>
           </property>
          </widget>
         </item>

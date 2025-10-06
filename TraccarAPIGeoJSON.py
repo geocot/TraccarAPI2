@@ -16,14 +16,19 @@ from geojson import Feature, FeatureCollection, Point
 from requests.auth import HTTPBasicAuth
 
 class Traccar:
-    def __init__(self, url:str, username: str, password:str) -> None:
-
-        self.url = url
-        self.username = username
-        self.password = password
+    def __init__(self) -> None:
         self.session = requests.Session()
         self.token = None
+
+
+    def setUrl(self, url:str) -> None:
+        self.url = url
         self.sessionUrl = f"{self.url}/api/session"
+    def setUsername(self, username:str) -> None:
+        self.username = username
+    def setPassword(self, password:str) -> None:
+        self.password = password
+
 
     def login(self):
         self.session.auth = HTTPBasicAuth(self.username, self.password)

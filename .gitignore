@@ -7,7 +7,7 @@ __pycache__/
 *.so
 
 #Ignore fichier de lancement pour les tests
-main.py
+main.txt
 
 # Distribution / packaging
 .Python
