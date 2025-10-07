@@ -28,9 +28,17 @@ class Traccar:
         self.username = username
     def setPassword(self, password:str) -> None:
         self.password = password
+    def setPath(self, path:str) -> None:
+        self.path = path
+    def setDeviceId(self, deviceId:int) -> None:
+        self.deviceId = deviceId
+    def setDateDebut(self, date:datetime) -> None:
+        self.dateDebut = date
+    def setDateFin(self, date:datetime) -> None:
+        self.dateFin = date
 
 
-    def login(self):
+    def _login(self)->bool:
         self.session.auth = HTTPBasicAuth(self.username, self.password)
         try:
             response = self.session.post(self.sessionUrl, data={'email': self.username, 'password': self.password})
@@ -39,54 +47,64 @@ class Traccar:
                 cookies = self.session.cookies.get_dict()
                 self.token = cookies['JSESSIONID']
                 print("Connecté!")
+                return True
             else:
                 print("Erreur de l'authentification")
                 print(response.status_code)
+                return False
 
         except requests.exceptions.RequestException as e:
                 print(f"Request failed: {str(e)}")
+                return False
 
-    def logout(self):
+    def _logout(self)->bool:
         try:
             self.session.delete(self.sessionUrl)
             self.session.close()
             print('Déconnexion!')
-
+            return True
         except requests.exceptions.RequestException as e:
             print(f"Requête avec problème: {str(e)}")
+            return False
 
-    def getPositionsJSON(self, device_id: int = None, date_debut: datetime = None, date_fin: datetime = None):
+    def _getPositionsJSON(self):
         "Retourne un élément JSON"
-        url = f"{self.url}/api/positions"
-        params = {}
-        if device_id:
-            params['deviceId'] = device_id
-        if date_debut:
-            params['from'] = date_debut.isoformat() + 'Z'
-        if date_fin:
-            params['to'] = date_fin.isoformat() + 'Z'
+        if self._login():
+            url = f"{self.url}/api/positions"
+            params = {}
+            if self.deviceId:
+                params['deviceId'] = self.deviceId
+            if self.dateDebut:
+                params['from'] = self.dateDebut.isoformat() + 'Z'
+            if self.dateFin:
+                params['to'] = self.dateFin.isoformat() + 'Z'
 
-        if self.session:
-            try:
-                response = self.session.get(url, params=params)
-                return response.json()
+            if self.session:
+                try:
+                    response = self.session.get(url, params=params)
+                    return response.json()
 
-            except requests.exceptions.RequestException as e:
-                print(f"Requête avec problème: {str(e)}")
+                except requests.exceptions.RequestException as e:
+                    print(f"Requête avec problème: {str(e)}")
+            self._logout()
 
-
-    def getPositionsGEOJSON(self, device_id: int = None, date_debut: datetime = None, date_fin: datetime = None, path:str = None):
+    def getPositionsGEOJSON(self):
         "Enregistre un GEOJSON dans un fichier : c:/temp/positions.geojson"
-        JSON = self.getPositionsJSON(device_id, date_debut, date_fin)
+        if self._login():
+            JSON = self._getPositionsJSON(self.deviceId, self.dateDebut, self.dateFin)
 
-        listePoints =  []
-        for position in JSON:
-            listePoints.append(Feature(geometry=Point((position['longitude'], position['latitude'])), properties={"deviceId":position["deviceId"], "deviceTime": position["deviceTime"], "id":position["id"]}))
-        fc = FeatureCollection(listePoints)
+            listePoints =  []
+            for position in JSON:
+                listePoints.append(Feature(geometry=Point((position['longitude'], position['latitude'])), properties={"deviceId":position["deviceId"], "deviceTime": position["deviceTime"], "id":position["id"]}))
+            fc = FeatureCollection(listePoints)
 
-        file = open(path, 'w')
-        file.write(str(fc))
-        file.close()
+            file = open(self.path, 'w')
+            file.write(str(fc))
+            file.close()
+            self._logout()
+
+    def blablbar(self):
+        print("blablbar")
 
 if __name__ == "__main__":
     import TraccarAPI2 as tr2
