@@ -136,7 +136,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QCalendarWidget" name="calDe">
+         <widget class="QCalendarWidget" name="calDebut">
           <property name="maximumSize">
            <size>
             <width>500</width>
@@ -164,7 +164,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QCalendarWidget" name="CalA">
+         <widget class="QCalendarWidget" name="calFin">
           <property name="maximumSize">
            <size>
             <width>500</width>

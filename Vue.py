@@ -19,9 +19,10 @@ class UI(QMainWindow):
         self.leUsager = self.findChild(QLineEdit,"leUsager")
         self.leMotPasse = self.findChild(QLineEdit,"leMotPasse")
         self.leDeviceId = self.findChild(QLineEdit,"leDeviceId")
-        self.calDe = self.findChild(QCalendarWidget,"calDe")
-        self.calDe.clicked.connect(self.calDeClicked)
-        self.calA = self.findChild(QCalendarWidget,"calA")
+        self.calDebut = self.findChild(QCalendarWidget, "calDebut")
+        self.calDebut.clicked.connect(self.calDebutClicked)
+        self.calFin = self.findChild(QCalendarWidget, "calFin")
+        self.calFin.clicked.connect(self.calFinClicked)
         self.btnFichierOut = self.findChild(QPushButton,"btnFichierOut")
         self.btnFichierOut.clicked.connect(self.ouvertureFichierOutut)
         self.laPath = self.findChild(QLabel,"laPath")
@@ -35,17 +36,18 @@ class UI(QMainWindow):
             self.laPath.setText(fichier[0])
             self.model.setPath(fichier[0])
 
-    def calDeClicked(self):
-        self.dateDebut = datetime.datetime(self.calDe.selectedDate().year(), self.calDe.selectedDate().month(), self.calDe.selectedDate().day())
-    def calAClicked(self):
-        self.dateFin = datetime.datetime(self.calDe.selectedDate().year(), self.calDe.selectedDate().month(), self.calDe.selectedDate().day())
+    def calDebutClicked(self):
+        self.dateDebut = datetime.datetime(self.calDebut.selectedDate().year(), self.calDebut.selectedDate().month(), self.calDebut.selectedDate().day())
+
+    def calFinClicked(self):
+        self.dateFin = datetime.datetime(self.calFin.selectedDate().year(), self.calFin.selectedDate().month(), self.calFin.selectedDate().day())
 
     def sauvegardeGeoJson(self):
-        if self.dateDebut < self.dateFin:
-            self.model.setDateDebut(self.dateDebut)
-            self.model.setDateFin(self.dateFin)
-            self.model.setUrl(self.leURL.text())
-            self.model.setUsername(self.leUsager.text())
-            self.model.setPassword(self.leMotPasse.text())
-            self.model.setDeviceId(self.leDeviceId.text())
-            self.model.getPositionsGEOJSON()
+            if self.dateDebut < self.dateFin:
+                self.model.setDateDebut(self.dateDebut)
+                self.model.setDateFin(self.dateFin)
+                self.model.setUrl(self.leURL.text())
+                self.model.setUsername(self.leUsager.text())
+                self.model.setPassword(self.leMotPasse.text())
+                self.model.setDeviceId(self.leDeviceId.text())
+                self.model.getPositionsGEOJSON()

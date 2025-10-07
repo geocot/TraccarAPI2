@@ -90,21 +90,17 @@ class Traccar:
 
     def getPositionsGEOJSON(self):
         "Enregistre un GEOJSON dans un fichier : c:/temp/positions.geojson"
-        if self._login():
-            JSON = self._getPositionsJSON(self.deviceId, self.dateDebut, self.dateFin)
 
-            listePoints =  []
-            for position in JSON:
-                listePoints.append(Feature(geometry=Point((position['longitude'], position['latitude'])), properties={"deviceId":position["deviceId"], "deviceTime": position["deviceTime"], "id":position["id"]}))
-            fc = FeatureCollection(listePoints)
+        JSON = self._getPositionsJSON()
 
-            file = open(self.path, 'w')
-            file.write(str(fc))
-            file.close()
-            self._logout()
+        listePoints =  []
+        for position in JSON:
+            listePoints.append(Feature(geometry=Point((position['longitude'], position['latitude'])), properties={"deviceId":position["deviceId"], "deviceTime": position["deviceTime"], "id":position["id"]}))
+        fc = FeatureCollection(listePoints)
 
-    def blablbar(self):
-        print("blablbar")
+        file = open(self.path, 'w')
+        file.write(str(fc))
+        file.close()
 
 if __name__ == "__main__":
     import TraccarAPI2 as tr2
