@@ -5,16 +5,29 @@
 #Pour recevoir les informations en format JSON de Traccar, utliser la méthode getPositionsJSON.
 #Pour enregistrer les informations de Traccar en format GEOJSON : getPositionsGEOJSON
 
-from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton, QLineEdit, QCalendarWidget, QMessageBox, QFileDialog, QLabel
+from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton, QLineEdit, QCalendarWidget, QMessageBox, \
+    QFileDialog, QLabel, QTextEdit
 from PyQt5 import uic
+from PyQt5 import QtCore
 import datetime
 
+#Création de la classe pour le signal
+class MySgnalEmitter(QtCore.QObject):
+    signal = QtCore.pyqtSignal(str)
+
 class UI(QMainWindow):
+
     def __init__(self, model):
         super(UI,self).__init__()
         uic.loadUi("vue.ui",self)
         self.setWindowTitle("Traccar API")
-        self.model = model #Définition du model
+
+        # Définition du model et du signal
+        self.model = model
+        self.signal_emitter = MySgnalEmitter() #Instance du signal
+        self.signal_emitter.signal.connect(self.ajoutLog) #Lien du signal lors de l'émission
+        self.model.setSignalLog(self.signal_emitter) #Injection du signal dans le model
+
         self.leURL = self.findChild(QLineEdit,"leURL")
         self.leUsager = self.findChild(QLineEdit,"leUsager")
         self.leMotPasse = self.findChild(QLineEdit,"leMotPasse")
@@ -28,6 +41,10 @@ class UI(QMainWindow):
         self.laPath = self.findChild(QLabel,"laPath")
         self.btnSauvegarde = self.findChild(QPushButton,"btnSauvegarde")
         self.btnSauvegarde.clicked.connect(self.sauvegardeGeoJson)
+        self.txtLog = self.findChild(QTextEdit,"txtLog")
+
+    def ajoutLog(self, msg):
+        self.txtLog.append(msg)
 
     def ouvertureFichierOutut(self):
         fichier = QFileDialog.getSaveFileName(self, "Sauvegarde GEOJSON", "position.geojson",
@@ -49,5 +66,4 @@ class UI(QMainWindow):
                 self.model.setUrl(self.leURL.text())
                 self.model.setUsername(self.leUsager.text())
                 self.model.setPassword(self.leMotPasse.text())
-                self.model.setDeviceId(self.leDeviceId.text())
                 self.model.getPositionsGEOJSON()

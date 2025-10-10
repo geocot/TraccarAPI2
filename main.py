@@ -18,8 +18,8 @@ class App(QApplication):
     def __init__(self, sys_argv):
         super(App, self).__init__(sys_argv)
         self.model = tr2.Traccar()
-        self.vue = Vue.UI(self.model)
-        self.vue.show()
+        self.controller = Controller.UI(self.model)
+        self.controller.show()
 
 
 if __name__ == "__main__":

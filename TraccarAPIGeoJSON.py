@@ -15,11 +15,14 @@ import datetime, requests
 from geojson import Feature, FeatureCollection, Point
 from requests.auth import HTTPBasicAuth
 
-class Traccar:
+class Traccar():
+
     def __init__(self) -> None:
         self.session = requests.Session()
         self.token = None
 
+    def setSignalLog(self, signalLog):
+        self.signalLog = signalLog
 
     def setUrl(self, url:str) -> None:
         self.url = url
@@ -37,6 +40,10 @@ class Traccar:
     def setDateFin(self, date:datetime) -> None:
         self.dateFin = date
 
+    def log(self, message:str) -> None:
+        if self.signalLog:
+            self.signalLog.signal.emit(message)
+        print(message)
 
     def _login(self)->bool:
         self.session.auth = HTTPBasicAuth(self.username, self.password)
@@ -46,58 +53,81 @@ class Traccar:
             if response.status_code == 200:
                 cookies = self.session.cookies.get_dict()
                 self.token = cookies['JSESSIONID']
-                print("Connecté!")
+                self.log("Connecté!")
                 return True
             else:
-                print("Erreur de l'authentification")
-                print(response.status_code)
+                self.log("Erreur de l'authentification")
+                self.log(response.status_code)
                 return False
 
         except requests.exceptions.RequestException as e:
-                print(f"Request failed: {str(e)}")
+                self.log(f"Problème avec une requête: {str(e)}")
                 return False
 
     def _logout(self)->bool:
         try:
             self.session.delete(self.sessionUrl)
             self.session.close()
-            print('Déconnexion!')
+            self.log('Déconnexion!')
             return True
         except requests.exceptions.RequestException as e:
-            print(f"Requête avec problème: {str(e)}")
+            self.log(f"Requête avec problème: {str(e)}")
             return False
 
-    def _getPositionsJSON(self):
-        "Retourne un élément JSON"
-        if self._login()==True:
+    def _getPositionsJSON(self, id):
+            "Retourne un élément JSON"
             url = f"{self.url}/api/positions"
             params = {}
-            if self.deviceId:
-                params['deviceId'] = self.deviceId
+            if id:
+                params['deviceId'] = id
             if self.dateDebut:
                 params['from'] = self.dateDebut.isoformat() + 'Z'
             if self.dateFin:
                 params['to'] = self.dateFin.isoformat() + 'Z'
-            print(params)
+
             if self.session:
                 try:
                     response = self.session.get(url, params=params)
                     return response.json()
 
                 except requests.exceptions.RequestException as e:
-                    print(f"Requête avec problème: {str(e)}")
-            self._logout()
+                    self.log(f"Requête avec problème: {str(e)}")
+
+    def getDevicesID(self):
+            url = f"{self.url}/api/devices"
+            if self.session:
+                try:
+                    response = self.session.get(url, params="")
+                    listeID = {}
+                    for device in response.json():
+                        listeID[device['name']]=device['id']
+                    return listeID
+                except requests.exceptions.RequestException as e:
+                    self.log(f"Requête avec problème: {str(e)}")
+                    return []
 
     def getPositionsGEOJSON(self):
-        "Enregistre un GEOJSON dans un fichier : c:/temp/positions.geojson"
+        if self._login() == True:
+            listePoints = []
+            dicoDevices = self.getDevicesID()
+            if dicoDevices:
+                for k in dicoDevices.keys():
+                    self.log("Recherche des positions de " + k)
+                    JSON = self._getPositionsJSON(dicoDevices[k])
+                    if JSON:
+                       for position in JSON:
+                          listePoints.append(Feature(geometry=Point((position['longitude'], position['latitude'])), properties={"nom":k,"deviceId":position["deviceId"], "deviceTime": position["deviceTime"], "id":position["id"]}))
+            self._logout()
+            self.sauvegarde(listePoints)
+        else:
+             self.log("Problème de connexion")
 
-        JSON = self._getPositionsJSON()
-        if JSON:
-            listePoints =  []
-            for position in JSON:
-                listePoints.append(Feature(geometry=Point((position['longitude'], position['latitude'])), properties={"deviceId":position["deviceId"], "deviceTime": position["deviceTime"], "id":position["id"]}))
+
+
+    def sauvegarde(self, listePoints):
+            "Enregistre un GEOJSON dans un fichier : c:/temp/positions.geojson"
+            self.log('Enregistrement')
             fc = FeatureCollection(listePoints)
-
             file = open(self.path, 'w')
             file.write(str(fc))
             file.close()
