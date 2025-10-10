@@ -11,7 +11,7 @@ except ModuleNotFoundError:
     print(f"Le module 'PyQt5' n'existe pas, veuillez l'installer")
 
 import TraccarAPIGeoJSON as tr2
-import Vue, sys
+import Controller, sys
 from PyQt5.QtWidgets import QApplication, QCalendarWidget
 
 class App(QApplication):

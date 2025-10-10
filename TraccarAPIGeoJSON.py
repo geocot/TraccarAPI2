@@ -69,7 +69,7 @@ class Traccar:
 
     def _getPositionsJSON(self):
         "Retourne un élément JSON"
-        if self._login():
+        if self._login()==True:
             url = f"{self.url}/api/positions"
             params = {}
             if self.deviceId:
@@ -78,7 +78,7 @@ class Traccar:
                 params['from'] = self.dateDebut.isoformat() + 'Z'
             if self.dateFin:
                 params['to'] = self.dateFin.isoformat() + 'Z'
-
+            print(params)
             if self.session:
                 try:
                     response = self.session.get(url, params=params)
@@ -92,21 +92,13 @@ class Traccar:
         "Enregistre un GEOJSON dans un fichier : c:/temp/positions.geojson"
 
         JSON = self._getPositionsJSON()
+        if JSON:
+            listePoints =  []
+            for position in JSON:
+                listePoints.append(Feature(geometry=Point((position['longitude'], position['latitude'])), properties={"deviceId":position["deviceId"], "deviceTime": position["deviceTime"], "id":position["id"]}))
+            fc = FeatureCollection(listePoints)
 
-        listePoints =  []
-        for position in JSON:
-            listePoints.append(Feature(geometry=Point((position['longitude'], position['latitude'])), properties={"deviceId":position["deviceId"], "deviceTime": position["deviceTime"], "id":position["id"]}))
-        fc = FeatureCollection(listePoints)
+            file = open(self.path, 'w')
+            file.write(str(fc))
+            file.close()
 
-        file = open(self.path, 'w')
-        file.write(str(fc))
-        file.close()
-
-if __name__ == "__main__":
-    import TraccarAPI2 as tr2
-    import datetime
-
-    t = tr2.Traccar("https://url.xyz", "votre courriel", "votre mot de passe")
-    t.login()
-    t.getPositionsGEOJSON(4, datetime.datetime(2025, 10, 4), datetime.datetime.now())
-    t.logout()
