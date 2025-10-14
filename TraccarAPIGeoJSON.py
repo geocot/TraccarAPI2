@@ -57,7 +57,7 @@ class Traccar():
                 return True
             else:
                 self.log("Erreur de l'authentification")
-                self.log(response.status_code)
+                self.log(str(response.status_code))
                 return False
 
         except requests.exceptions.RequestException as e:
@@ -107,6 +107,7 @@ class Traccar():
                     return []
 
     def getPositionsGEOJSON(self):
+
         if self._login() == True:
             listePoints = []
             dicoDevices = self.getDevicesID()

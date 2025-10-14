@@ -60,6 +60,7 @@ class UI(QMainWindow):
         self.dateFin = datetime.datetime(self.calFin.selectedDate().year(), self.calFin.selectedDate().month(), self.calFin.selectedDate().day())
 
     def sauvegardeGeoJson(self):
+        try:
             if self.dateDebut < self.dateFin:
                 self.model.setDateDebut(self.dateDebut)
                 self.model.setDateFin(self.dateFin)
@@ -67,3 +68,5 @@ class UI(QMainWindow):
                 self.model.setUsername(self.leUsager.text())
                 self.model.setPassword(self.leMotPasse.text())
                 self.model.getPositionsGEOJSON()
+        except Exception as e:
+            self.ajoutLog(f"Erreur de l'authentification: {str(e)}")
